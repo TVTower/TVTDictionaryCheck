@@ -23,3 +23,7 @@ Obviously this does not mean that the key will actually be used.
 # TypeUsageChecker
 
 Prototype for quick and dirty analysis of usages in bmx code
+
+# TVTStatistics
+
+Evaluate statistics.csv files written by TVTower aggregating information about ad income, daily costs etc. based on the players' reach.
