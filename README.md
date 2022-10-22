@@ -27,3 +27,8 @@ Prototype for quick and dirty analysis of usages in bmx code
 # TVTStatistics
 
 Evaluate statistics.csv files written by TVTower aggregating information about ad income, daily costs etc. based on the players' reach.
+
+# SaveGameSizeAnalyzer
+
+Aggregate information about the size of different blocks across a number of save games.
+This allows to check which part of the game use up the most space and which contribute the most to the increase of save game size.
