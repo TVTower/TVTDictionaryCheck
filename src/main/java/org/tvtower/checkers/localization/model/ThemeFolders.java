@@ -1,4 +1,4 @@
-package org.tvtower.localization.model;
+package org.tvtower.checkers.localization.model;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,7 +9,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 
-import org.tvtower.localization.readers.TvtLocaleReader;
+import org.tvtower.checkers.readers.TvtLocaleReader;
 
 public class ThemeFolders {
 

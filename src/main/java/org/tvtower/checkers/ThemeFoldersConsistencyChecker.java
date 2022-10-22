@@ -1,13 +1,17 @@
-package org.tvtower.localization.checkers;
+package org.tvtower.checkers;
 
 import java.io.IOException;
 
-import org.tvtower.localization.model.ThemeFolders;
+import org.tvtower.checkers.localization.model.ThemeFolders;
+import org.tvtower.checkers.readers.Directories;
 
 //TODO check duplicate keys
 //TODO check duplicate values (combine keys possible?)
 public class ThemeFoldersConsistencyChecker {
 
+	/**
+	 * check if localization directories are consistent - same keys defined everywhere
+	 * */
 	public static void main(String[] args) {
 		checkThemeFoldersContent(Directories.TVT_BASE_DIR);
 		//checkThemeFoldersAgainstOriginalFiles(Directories.TVT_BASE_DIR);

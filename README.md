@@ -19,3 +19,7 @@ Some keys do not appear in the source code as such but are assembled typically f
 `src/main/resources/prefixes.txt` contains some such prefixes.
 Keys starting with such a prefix will not be reported as not being present in the source code.
 Obviously this does not mean that the key will actually be used.
+
+# TypeUsageChecker
+
+Prototype for quick and dirty analysis of usages in bmx code

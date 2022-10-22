@@ -1,4 +1,4 @@
-package org.tvtower.localization.model;
+package org.tvtower.checkers.localization.model;
 
 import java.io.File;
 import java.io.IOException;

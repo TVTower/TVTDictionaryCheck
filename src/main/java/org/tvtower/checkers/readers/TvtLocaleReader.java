@@ -1,4 +1,4 @@
-package org.tvtower.localization.readers;
+package org.tvtower.checkers.readers;
 
 import java.io.File;
 import java.io.IOException;
@@ -16,7 +16,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import org.tvtower.localization.model.LocaleInfo;
+import org.tvtower.checkers.localization.model.LocaleInfo;
 
 public class TvtLocaleReader {
 
@@ -33,17 +33,21 @@ public class TvtLocaleReader {
 		}
 	}
 
-	public void storeContent(String baseDir) throws IOException {
+	public void storeContent(String baseDir) {
 		File dir = new File(baseDir);
-		Files.walkFileTree(dir.toPath(), new SimpleFileVisitor<Path>() {
-			@Override
-			public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
-				if(file.getFileName().toString().endsWith(".txt")) {
-					storeContent(file);
+		try {
+			Files.walkFileTree(dir.toPath(), new SimpleFileVisitor<Path>() {
+				@Override
+				public FileVisitResult visitFile(Path file, BasicFileAttributes attrs) throws IOException {
+					if(file.getFileName().toString().endsWith(".txt")) {
+						storeContent(file);
+					}
+					return FileVisitResult.CONTINUE;
 				}
-				return FileVisitResult.CONTINUE;
-			}
-		});
+			});
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
 	}
 
 	public List<LocaleInfo> getLocales() {
