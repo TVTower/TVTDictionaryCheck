@@ -14,7 +14,7 @@ public class SaveGameSizeAnalyzer {
 	static Map<String, SaveGameInfo>infos=new TreeMap<>();
 
 	public static void main(String[] args) throws IOException {
-		File[] games = new File("result/savegames/1985_normal").listFiles();
+		File[] games = new File("results/savegames/1985_normal").listFiles();
 		SaveGameInfo last=null;
 		for (File game : games) {
 			SaveGameInfo info = new SaveGameInfo(game);

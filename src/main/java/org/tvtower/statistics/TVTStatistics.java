@@ -8,42 +8,29 @@ import org.tvtower.statistics.ReachAggregate.PrintHourMode;
 public class TVTStatistics {
 
 	public static void main(String[] args) {
-		File baseFolder=new File("result/statistics");
-		File[] subFolders = baseFolder.listFiles();
-		ArrayList<FolderAggregate> aggreagates = new ArrayList<FolderAggregate>();
+		File baseFolder=new File("results/statistics");
 
 		ReachAggregate.printHourMode=PrintHourMode.prime;
 		ReachAggregate.showNormalizedToReach=false;
-
-		for (File file : subFolders) {
-//			boolean printFile=contains(file, "CPM2", "CPM3");
-			boolean printFile=contains(file, "95");
-//			boolean printFile=true;
-			if(printFile) {
-				System.out.println(file);
-				FolderAggregate agg = new FolderAggregate(baseFolder, file.getName());
-				aggreagates.add(agg);
-
-				printAll(agg);
-//				printSelectedReaches(agg);
-
-				System.out.println();
-			}
-		}
+		analyseFolder(baseFolder);
 	}
 
-	private static boolean contains(File folder, String ...segments) {
-		String name = folder.getName();
-		if(segments==null) {
-			return true;
-		}else {
-			for (String segment : segments) {
-				if(name.contains(segment)) {
-					return true;
-				}
+	private static void analyseFolder(File folder) {
+		File[] content = folder.listFiles();
+		ArrayList<FolderAggregate> aggreagates = new ArrayList<FolderAggregate>();
+		for (File file : content) {
+			if(file.isDirectory()) {
+				analyseFolder(file);
+				FolderAggregate agg = new FolderAggregate(folder, file.getName());
+				aggreagates.add(agg);
 			}
 		}
-		return false;
+		aggreagates.forEach(agg->{
+			agg.startSummary();
+			printAll(agg);
+//				printSelectedReaches(agg);
+			agg.done();
+		});
 	}
 
 	private static void printAll(FolderAggregate agg) {

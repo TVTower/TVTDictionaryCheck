@@ -25,8 +25,8 @@ public class HourAggregate {
 		return hour;
 	}
 
-	public void print() {
-		System.out.println("    "+hour+ " - avgProfit "+avgProfit());
+	public String print() {
+		return "    "+hour+ " - avgProfit "+avgProfit();
 	}
 
 	public int avgProfit() {

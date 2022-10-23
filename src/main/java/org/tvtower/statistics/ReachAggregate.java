@@ -39,42 +39,46 @@ public class ReachAggregate {
 		}
 	}
 
-	public void print(int normalizedReach) {
+	public List<String> print(int normalizedReach) {
+		List<String> result=new ArrayList<>();
 		HourAggregate rep = hourAggregates.get(0);
 		if(rep.avgReach()==0) {
-			return;
+			return result;
 		}
 		long avgReach = rep.avgReach();
 		long avgCosts = rep.avgCost();
 		long avgCostPM=avgCosts / (avgReach/1000);
-		System.out.println(" reach " +min +" - "+ max +"; costPerMil "+avgCostPM+" avgReach "+rep.avgReach()+" avgCostsPerDay "+rep.avgCost());
+		result.add(" reach " +min +" - "+ max +"; costPerMil "+avgCostPM+" avgReach "+rep.avgReach()+" avgCostsPerDay "+rep.avgCost());
 		long hourProfit=0;
 		boolean hourFound=false;
 		for (HourAggregate agg : hourAggregates.values()) {
 			hourProfit=hourProfit+agg.avgProfit();
 			if(hourProfit>=avgCosts && !hourFound) {
-				System.out.println("   antenna fixed costs payed at hour "+agg.getHour());
+				result.add("   antenna fixed costs payed at hour "+agg.getHour());
 				hourFound=true;
 			}
 		}
 		long dayProfit=hourProfit-avgCosts;
-		System.out.println("   day's avg profit (fix costs payed): "+dayProfit);
+		result.add("   day's avg profit (fix costs payed): "+dayProfit);
 		if(normalizedReach > 0 && showNormalizedToReach) {
-			System.out.println("   normalized to reach "+normalizedReach+ " - costs: "+normalizedReach*avgCosts/avgReach +", dayProfit: "+normalizedReach*dayProfit/avgReach);
+			result.add("   normalized to reach "+normalizedReach+ " - costs: "+normalizedReach*avgCosts/avgReach +", dayProfit: "+normalizedReach*dayProfit/avgReach);
 		}
-		printHours();
+		result.addAll(printHours());
+		return result;
 	}
 
-	private void printHours() {
+	private List<String> printHours() {
+		List<String> result=new ArrayList<>();
 		switch (printHourMode) {
 		case all:
-			hourAggregates.values().forEach(h->h.print());
+			hourAggregates.values().forEach(h->result.add(h.print()));
 			break;
 		case prime:
-			hourAggregates.values().stream().filter(h->h.getHour()>17).forEach(h->h.print());
+			hourAggregates.values().stream().filter(h->h.getHour()>17).forEach(h->result.add(h.print()));
 			break;
 		default:
 			break;
 		}
+		return result;
 	}
 }
