@@ -12,4 +12,8 @@ public class Directories {
 	public static String getSourceDir(String baseDir) {
 		return baseDir+"/source";
 	}
+
+	public static String getLogDir(String baseDir) {
+		return baseDir+"/logfiles";
+	}
 }

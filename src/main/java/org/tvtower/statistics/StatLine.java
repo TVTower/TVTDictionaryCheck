@@ -1,13 +1,16 @@
 package org.tvtower.statistics;
 
+import java.math.BigDecimal;
+
 public class StatLine {
 
-	int player;
-	int day;
-	int hour;
-	int reach;
-	int costs;
-	int income;
+	public final int player;
+	public final int day;
+	public final int hour;
+	public int reach;
+	public int costs;
+	public final int income;
+	public final BigDecimal image;
 
 	public StatLine (String line) {
 		String[] split = line.split(";");
@@ -17,6 +20,11 @@ public class StatLine {
 		reach=get(split,3);
 		costs=get(split,4);
 		income=get(split,5);
+		BigDecimal img=null;
+		if(split.length>6 && !"-".equals(split[6])) {
+			img=new BigDecimal(split[6]);
+		}
+		image=img;
 	}
 
 	private static int get(String[] split, int index) {
