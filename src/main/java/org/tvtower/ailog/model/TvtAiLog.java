@@ -6,6 +6,7 @@ import java.util.List;
 public class TvtAiLog {
 
 	private List<TvtAiTask> tasks = new ArrayList<>();
+	private TVTTaskTimeAggregator aggregator = new TVTTaskTimeAggregator();
 
 	private TvtAiTask currentTask;
 	private int playerNumber;
@@ -56,8 +57,9 @@ public class TvtAiLog {
 		System.out.println(playerNumber);
 		System.out.println(tasks.size() + " tasks");
 		for (TvtAiTask t : tasks) {
-			System.out.println("day " + t.getDay() + ":" + t.getHour() + " " + t.getName());
+			aggregator.add(t);
 		}
+		aggregator.printOverview();
 	}
 
 	public static final String extractGameTime(String l) {
@@ -66,5 +68,22 @@ public class TvtAiLog {
 			throw new IllegalArgumentException("not a regular log line: " + l);
 		}
 		return time;
+	}
+
+	public static final int minutes(String time1, String time2) {
+		int hour1 = hour(time1);
+		int hour2 = hour(time2);
+		int minute1 = minute(time1);
+		int minute2 = minute(time2);
+		int diff = (60 * hour2 + minute2) - (60 * hour1 + minute1);
+		return (diff + 24 * 60) % (24 * 60);
+	}
+
+	public static final int hour(String time) {
+		return Integer.parseInt(time.substring(0, 2));
+	}
+
+	public static final int minute(String time) {
+		return Integer.parseInt(time.substring(3, 5));
 	}
 }

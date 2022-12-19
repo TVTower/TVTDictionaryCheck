@@ -9,7 +9,10 @@ public class TvtAiTask {
 	private boolean done = false;
 	private int day = -1;
 	private String taskStartTime;
+	private String enterRoomTime;
 	private int hour = -1;
+	private int goToRoomMinutes = 0;
+	private int totalMinutes = -1;
 	private List<TVTAiJob> jobs = new ArrayList<>();
 
 	public TvtAiTask(int currentDay) {
@@ -29,14 +32,19 @@ public class TvtAiTask {
 				throw new IllegalStateException();
 			}
 		}
+		if (l.contains("AIJobGoToRoom: Entering roomId:")) {
+			enterRoomTime = TvtAiLog.extractGameTime(l);
+			goToRoomMinutes = TvtAiLog.minutes(taskStartTime, enterRoomTime);
+		}
 		if (l.contains("Task finished")) {
+			totalMinutes = TvtAiLog.minutes(taskStartTime, TvtAiLog.extractGameTime(l));
 			done = true;
 		}
 	}
 
 	private void extractTaskStartTime(String l) {
 		taskStartTime = TvtAiLog.extractGameTime(l);
-		hour = Integer.parseInt(taskStartTime.substring(0, 2));
+		hour = TvtAiLog.hour(taskStartTime);
 	}
 
 	public int getHour() {
@@ -58,5 +66,13 @@ public class TvtAiTask {
 		} else {
 			return false;
 		}
+	}
+
+	public int getTaskTime() {
+		return totalMinutes - goToRoomMinutes;
+	}
+
+	public int getGoToRoomMinutes() {
+		return goToRoomMinutes;
 	}
 }

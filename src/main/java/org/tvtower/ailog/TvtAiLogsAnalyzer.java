@@ -11,10 +11,7 @@ public class TvtAiLogsAnalyzer {
 	}
 
 	// TODO:
-	// * Zeit Start bis Raum betreten
 	// * Zeit pro Job
-	// * Zeit für Taskausführung
 	// * Gruppieren
 	// * Anzahl Tasks pro Tag (Vergleich)
-	// * Zeit bis Raum betreten (Vergleich)
 }
