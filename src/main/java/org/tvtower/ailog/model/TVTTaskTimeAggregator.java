@@ -2,8 +2,10 @@ package org.tvtower.ailog.model;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.stream.Collectors;
 
 class TVTTaskTimeAggregator {
 
@@ -14,8 +16,8 @@ class TVTTaskTimeAggregator {
 		agg.add(t);
 	}
 
-	public void printOverview() {
-		aggregates.values().forEach(agg -> agg.printOverview());
+	public List<String> printOverview() {
+		return aggregates.values().stream().map(agg -> agg.printOverview()).collect(Collectors.toList());
 	}
 
 	private static class TvtTaskAggregate {
@@ -29,10 +31,22 @@ class TVTTaskTimeAggregator {
 
 		public TvtTaskAggregate(String name) {
 			taskName = name;
+			while (taskName.length() < 20) {
+				taskName = taskName+" ";
+			}
 		}
 
-		public void printOverview() {
-			System.out.println(taskName + " " + count + " " + getAverageGoToRoomTime() + " " + getAverageTaskTime());
+		public String printOverview() {
+			return taskName+ pad(count, 5) + pad(getAverageGoToRoomTime(), 7) + pad(getAverageTaskTime(), 7);
+		}
+
+		private String pad(Object o, int length) {
+			Object toShow = o;
+			String result = (toShow == null) ? "" : toShow.toString();
+			while (result.length() < length) {
+				result = " " + result;
+			}
+			return result;
 		}
 
 		void add(TVTAiTask t) {

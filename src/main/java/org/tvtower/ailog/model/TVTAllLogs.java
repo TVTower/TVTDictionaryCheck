@@ -20,13 +20,18 @@ public class TVTAllLogs {
 
 	private FileAggregate statAggregator;
 	private Map<Integer, TVTAiPlayer> logs = new LinkedHashMap<>();
-	private int lastDay=-1;
+	private int lastDay = -1;
+
+	private File targetFile;
+	private List<String> targetLines = new ArrayList<>();
+	private boolean newLineFirst = false;
 
 	public TVTAllLogs(String logDir) {
+		targetFile = new File(logDir, "analysis_" + new File(logDir).getName() + ".txt");
 		File statisticsLog = new File(logDir, "statistic.csv");
 		if (statisticsLog.exists()) {
 			statAggregator = new FileAggregate(statisticsLog);
-			lastDay= statAggregator.getLines().get(statAggregator.getLines().size()-1).day;
+			lastDay = statAggregator.getLines().get(statAggregator.getLines().size() - 1).day;
 		}
 		for (int i = 1; i <= 4; i++) {
 			readAiLog(logDir, i);
@@ -56,37 +61,48 @@ public class TVTAllLogs {
 	// TODO compare all in one table
 
 	public void showTaskOverview(int startDay, int endDay) {
+		print("Task Overview");
 		analyze(startDay, endDay, (s, e) -> {
-			logs.values().forEach(l -> l.showTaskOverview(s, e));
+			logs.values().forEach(l -> {
+				l.showTaskOverview(s, e).forEach(l2 -> print(l2));
+			});
 		});
+		newLineFirst = true;
 	}
 
 	public void analyzePerformance(int startDay, int endDay, boolean summaryOnly) {
 		analyze(startDay, endDay, (s, e) -> {
-			System.out.println("Overview up to day "+getLastDayWithData(endDay));
-			List<List<String>> tableColums=new ArrayList<>();
+			int lastDayWithData = getLastDayWithData(endDay);
+			print("Overview up to day " + lastDayWithData);
+			List<List<String>> tableColums = new ArrayList<>();
 			tableColums.add(TVTAiPlayer.overviewHeaders());
-			logs.values().forEach(p->tableColums.add(p.getOverviewColumn(startDay, getLastDayWithData(endDay))));
-			int lines=tableColums.get(0).size();
-			for(int line=0; line<lines;line++) {
-				final int lineToUse=line;
-				String lineString=tableColums.stream().map(c->c.get(lineToUse)).collect(Collectors.joining("|"));
-				System.out.println(lineString);
+			logs.values().stream().sorted(
+					(a, b) -> b.getPlayerDay(lastDayWithData).image.compareTo(a.getPlayerDay(lastDayWithData).image))
+					.forEach(p -> tableColums.add(p.getOverviewColumn(startDay, lastDayWithData)));
+			int lines = tableColums.get(0).size();
+			for (int line = 0; line < lines; line++) {
+				final int lineToUse = line;
+				String lineString = tableColums.stream().map(c -> c.get(lineToUse)).collect(Collectors.joining("|"));
+				print(lineString);
 			}
-			if(!summaryOnly) {
-				System.out.println("\nSinglePlayers\n");
-				logs.values().forEach(l -> l.analyze(s, e));
+			if (!summaryOnly) {
+				print("\nSingle Players");
+				logs.values().stream().forEach(l -> {
+					newLineFirst = true;
+					l.analyze(s, e).forEach(l2 -> print(l2));
+				});
 			}
 		});
+		newLineFirst = true;
 	}
 
 	private int getLastDayWithData(int endDay) {
-		if (lastDay>0) {
-			if(endDay>0 && endDay<lastDay) {
+		if (lastDay > 0) {
+			if (endDay > 0 && endDay < lastDay) {
 				return endDay;
 			}
 			return lastDay;
-		}else {
+		} else {
 			throw new IllegalStateException("last day has to be determined from player data");
 		}
 	}
@@ -104,5 +120,24 @@ public class TVTAllLogs {
 			throw new IllegalArgumentException("startDay must not be after endDay");
 		}
 		analyze.accept(start.get(), end.get());
+	}
+
+	public void done() {
+		try {
+			if (targetFile.exists()) {
+				targetFile.delete();
+			}
+			Files.write(targetFile.toPath(), targetLines);
+		} catch (IOException e) {
+			throw new UncheckedIOException(e);
+		}
+	}
+
+	private void print(String line) {
+		if (newLineFirst) {
+			targetLines.add("");
+			newLineFirst = false;
+		}
+		targetLines.add(line);
 	}
 }

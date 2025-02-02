@@ -6,6 +6,7 @@ import java.text.NumberFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
@@ -63,49 +64,52 @@ class TVTAiPlayer {
 		currentDay.addLine(l);
 	}
 
-	public void analyze(int startDay, int endDay) {
-		System.out.println("player " + playerNumber);
+	public List<String> analyze(int startDay, int endDay) {
+		List<String> result=new ArrayList<>();
+		result.add("player " + playerNumber);
 		final int end = endDay < 0 ? Integer.MAX_VALUE : endDay;
 		// failed ads overview
 		Predicate<TVTAiPlayerDay> dayPred = d -> (d.day >= startDay && d.day <= end);
 
-		playerDays.stream().filter(dayPred)
-		.forEach(d->{
-			int day=d.day;
-			String prefix="day "+(day<10?"  "+day:(day<100?" "+day:day))+": ";
-			if(d.count(Category.adFailed) > 0) {
-				System.out.println(prefix + d.count(Category.adFailed)
-				+ " !failed spots! hours: " + d.hours(Category.adFailed));
+		playerDays.stream().filter(dayPred).forEach(d -> {
+			int day = d.day;
+			String prefix = "day " + (day < 10 ? "  " + day : (day < 100 ? " " + day : day)) + ": ";
+			if (d.count(Category.adFailed) > 0) {
+				result.add(
+						prefix + d.count(Category.adFailed) + " !failed spots! hours: " + d.hours(Category.adFailed));
 			}
-			if(d.count(Category.adTrailer) > 0) {
-				System.out.println(prefix + d.count(Category.adTrailer)
-				+ " trailers       hours: " + d.hours(Category.adTrailer));
+			if (d.count(Category.adTrailer) > 0) {
+				result.add(
+						prefix + d.count(Category.adTrailer) + " trailers       hours: " + d.hours(Category.adTrailer));
 			}
-			d.interestingLogLines.forEach(l->{
-				System.out.println(prefix +l);
+			d.interestingLogLines.forEach(l -> {
+				result.add(prefix + l);
 			});
 		});
 
 		// TODO really analyze
-//		System.out.println("player " + playerNumber);
+//		result.add("player " + playerNumber);
 //		if (adTracer.hasContent()) {
-//			System.out.println("\nad tracer:");
-//			System.out.println(adTracer.getInfo());
+//			result.add("\nad tracer:");
+//			result.add(adTracer.getInfo());
 //		}
 //
-		System.out.println("-----------------\n");
+		result.add("-----------------");
+		return result;
 	}
 
 	public static List<String> overviewHeaders() {
 		List<String> result = new ArrayList<>();
 		result.add("                 ");
 		result.add("-----------------");
+		result.add("image            ");
 		result.add("money            ");
 		result.add("receivers        ");
-		result.add("image            ");
 		result.add("daily costs      ");
 		result.add("total ad income  ");
 		result.add("total ad penalty ");
+		result.add("failed spots     ");
+		result.add("trailers         ");
 		return result;
 	}
 
@@ -114,12 +118,21 @@ class TVTAiPlayer {
 		TVTAiPlayerDay endDayData = getPlayerDay(endDay);
 		result.add("       " + playerNumber + "       ");
 		result.add("---------------");
+		result.add(pad(endDayData.hours.get(23).image));
 		result.add(pad(endDayData.currentMoney));
 		result.add(pad(endDayData.hours.get(23).receivers));
-		result.add(pad(endDayData.hours.get(23).image));
 		result.add(pad(endDayData.hours.get(23).dailyCosts));
 		result.add(pad(endDayData.totalAdIncome));
 		result.add(pad(endDayData.totalFailedAdsCost));
+		AtomicInteger failed = new AtomicInteger(0);
+		AtomicInteger trailer = new AtomicInteger(0);
+		playerDays.stream().filter(d->(d.day>=startDay && d.day<=endDay))
+		.forEach(d->{
+			failed.addAndGet((int)d.count(Category.adFailed));
+			trailer.addAndGet((int)d.count(Category.adTrailer));
+		});
+		result.add(pad(failed.get()));
+		result.add(pad(trailer.get()));
 		return result;
 	}
 
@@ -136,18 +149,19 @@ class TVTAiPlayer {
 		return result + " ";
 	}
 
-	public void showTaskOverview(int startDay, int endDay) {
+	public List<String> showTaskOverview(int startDay, int endDay) {
+		List<String> result=new ArrayList<>();
 		final int end = endDay < 0 ? Integer.MAX_VALUE : endDay;
-		System.out.println("player " + playerNumber);
 		TVTTaskTimeAggregator aggregator = new TVTTaskTimeAggregator();
 		List<TVTAiTask> tasks = playerDays.stream().filter(d -> (d.day >= startDay && d.day <= end))
 				.flatMap(d -> d.tasks.stream()).collect(Collectors.toList());
-		System.out.println("\n" + tasks.size() + " tasks");
+		result.add("\nPlayer " + playerNumber +": "+tasks.size() + " tasks");
 		for (TVTAiTask t : tasks) {
 			aggregator.add(t);
 		}
-		aggregator.printOverview();
-		System.out.println("-----------------\n");
+		result.addAll(aggregator.printOverview());
+		result.add("-----------------");
+		return result;
 	}
 
 	public static final String extractGameTime(String l) {

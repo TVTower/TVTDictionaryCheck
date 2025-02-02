@@ -28,8 +28,8 @@ class TVTAiPlayerDay {
 	int currentMoney;
 //	int totalReceivers;
 	
-	int totalTrailersCount;
-	int totalFailedAdsCount;
+//	int totalTrailersCount;
+//	int totalFailedAdsCount;
 	int dayFailedAdConsts;
 	int totalFailedAdsCost;
 	int dayAdIncome;
@@ -76,6 +76,9 @@ class TVTAiPlayerDay {
 		}
 		TVTAiPlayerHour hour = hours.get(l.hour);
 		hour.populateFrom(l);
+		if(l.hour==23) {
+			image=l.image;
+		}
 	}
 
 	public long count(Category cat) {
