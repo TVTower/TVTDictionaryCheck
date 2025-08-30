@@ -145,7 +145,7 @@ public class ThemeFolder {
 
 	private String propName(String line) {
 		if (line.isEmpty() || line.startsWith("##")) {
-			return line;
+			return "";//or return line if you want to ensure identical comments
 		} else {
 			String result = line.substring(0, line.indexOf('=') + 1);
 			if (result.charAt(0) == '#') {

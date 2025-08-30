@@ -27,7 +27,7 @@ public class ThemeFolders {
 	public void check() {
 		if (folders.stream().allMatch(f -> f.checkKeysCoincide())) {
 			System.out.println("Yes, keys and structure is consistent.");
-			if(folders.stream().anyMatch(f -> !f.checkVariableUsage())) {
+			if(!folders.stream().allMatch(f -> f.checkVariableUsage())) {
 				System.out.println("But variables have to be checked.");
 			}
 		}else {
